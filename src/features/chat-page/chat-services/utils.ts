@@ -29,3 +29,16 @@ export const mapOpenAIChatMessages = (
     }
   });
 };
+
+// 🔧 Entfernt alle Embedding-Felder aus einem Dokument, selber ergänzt
+export function removeEmbeddingsFromDocument<T extends object>(
+    doc: T,
+    embeddingFields: string[]
+): T {
+  const cleanedDoc = { ...doc };
+  for (const field of embeddingFields) {
+    delete cleanedDoc[field as keyof T];
+  }
+  return cleanedDoc;
+}
+

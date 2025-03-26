@@ -5,6 +5,8 @@ import { uniqueId } from "@/features/common/util";
 import { SqlQuerySpec } from "@azure/cosmos";
 import { DocumentSearchResponse } from "./azure-ai-search/azure-ai-search";
 import { CHAT_CITATION_ATTRIBUTE, ChatCitationModel } from "./models";
+//selber hinzugefügt
+import { removeEmbeddingsFromDocument } from "@/features/chat-page/chat-services/utils"
 
 export const CreateCitation = async (
   model: ChatCitationModel
@@ -100,20 +102,31 @@ export const FindCitationByID = async (
   }
 };
 
+// export const FormatCitations = (citation: DocumentSearchResponse[]) => {
+//   const withoutEmbedding: DocumentSearchResponse[] = [];
+//   citation.forEach((d) => {
+//     withoutEmbedding.push({
+//       score: d.score,
+//       document: {
+//         metadata: d.document.metadata,
+//         pageContent: d.document.pageContent,
+//         chatThreadId: d.document.chatThreadId,
+//         id: d.document.id,
+//         user: d.document.user,
+//       },
+//     });
+//   });
+//
+//   return withoutEmbedding;
+// };
 export const FormatCitations = (citation: DocumentSearchResponse[]) => {
-  const withoutEmbedding: DocumentSearchResponse[] = [];
-  citation.forEach((d) => {
-    withoutEmbedding.push({
-      score: d.score,
-      document: {
-        metadata: d.document.metadata,
-        pageContent: d.document.pageContent,
-        chatThreadId: d.document.chatThreadId,
-        id: "",
-        user: "",
-      },
-    });
-  });
-
-  return withoutEmbedding;
+  return citation.map((d) => ({
+    score: d.score,
+    document: removeEmbeddingsFromDocument(d.document, [
+      "DescriptionVector",
+      "HotelNameVector",
+      "Description_frvector",
+      "text_vector"
+    ]),
+  }));
 };

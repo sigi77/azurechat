@@ -9,6 +9,8 @@ import {
 } from "@/features/common/services/ai-search";
 import { OpenAIEmbeddingInstance } from "@/features/common/services/openai";
 import { uniqueId } from "@/features/common/util";
+//selber hinzugefügt
+import { removeEmbeddingsFromDocument } from "@/features/chat-page/chat-services/utils"
 import {
   AzureKeyCredential,
   SearchClient,
@@ -123,6 +125,7 @@ export const SimilaritySearch = async (
   }
 };
 
+//Original
 export const ExtensionSimilaritySearch = async (props: {
   searchText: string;
   vectors: string[];
@@ -174,16 +177,25 @@ export const ExtensionSimilaritySearch = async (props: {
       const document = item.document as any;
       const newDocument: any = {};
 
-      for (const key in document) {
-        const hasKey = vectors.includes(key);
-        if (!hasKey) {
-          newDocument[key] = document[key];
-        }
-      }
+      //for (const key in document) {
+      //  const hasKey = vectors.includes(key);
+       // if (!hasKey) {
+        //  newDocument[key] = document[key];
+        //}
+     // }
+
+      //results.push({
+       // score: result.score,
+        //document: newDocument,
+      //});
+      // Liste der Felder, die du aus dem Index als Embeddings nutzt
+      const embeddingFields = ["DescriptionVector", "HotelNameVector", "Description_frvector","text_vector"];
+
+      const cleaned = removeEmbeddingsFromDocument(result.document, embeddingFields);
 
       results.push({
         score: result.score,
-        document: newDocument,
+        document: cleaned,
       });
     }
 
