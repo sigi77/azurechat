@@ -11,8 +11,7 @@ export const PersonaHero = () => {
           <VenetianMask size={36} strokeWidth={1.5} /> Persona
         </>
       }
-      description={`  Persona is a representation of a personality that you can use to
-    have a conversation with.`}
+      description={`  Die Persona beschreibt den Chatbot. Du kannst beispielsweise festlegen, wie sich der Chatbot ausdrücken soll, sowie seine Rolle und Aufgabe definieren. Die von dir erstellten Personas erscheinen unter „Meine Chatbots“ auf der Startseite.`}
     >
       <HeroButton
         title="New Persona"
