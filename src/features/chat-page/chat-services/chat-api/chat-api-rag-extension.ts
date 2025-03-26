@@ -24,6 +24,8 @@ export const SearchAzureAISimilarDocuments = async (req: Request) => {
       console.error("🔴 Retrieving documents", result.errors);
       return new Response(JSON.stringify(result));
     }
+   // console.log("🔍 Search Result:", JSON.stringify(result.response, null, 2));
+
 
     const withoutEmbedding = FormatCitations(result.response);
     const citationResponse = await CreateCitations(withoutEmbedding, userId);
