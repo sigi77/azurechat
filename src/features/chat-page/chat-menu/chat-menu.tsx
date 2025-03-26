@@ -72,9 +72,9 @@ export const GroupChatThreadByType = (menuItems: Array<ChatThreadModel>) => {
   }, {} as Record<MenuItemsGroupName, Array<MenuItemsGroup>>);
 
   const records: Record<MenuItemsGroupName, Array<MenuItemsGroup>> = {
-    Favoriten: menuItemsGrouped["Bookmarked"]?.sort(sortByTimestamp),
-    "Letzten 7 Tage": menuItemsGrouped["Past 7 days"]?.sort(sortByTimestamp),
-    Früher: menuItemsGrouped["Previous"]?.sort(sortByTimestamp),
+    Bookmarked: menuItemsGrouped["Bookmarked"]?.sort(sortByTimestamp),
+    "Past 7 days": menuItemsGrouped["Past 7 days"]?.sort(sortByTimestamp),
+    Previous: menuItemsGrouped["Previous"]?.sort(sortByTimestamp),
   };
 
   return records;
