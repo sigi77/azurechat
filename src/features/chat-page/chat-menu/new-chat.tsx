@@ -12,11 +12,11 @@ export const NewChat = () => {
     <Button
       aria-disabled={pending}
       size={"default"}
-      className="flex gap-2"
+      className="flex gap-2, bg-primary text-primary-foreground"
       variant={"outline"}
     >
       {pending ? <LoadingIndicator isLoading={pending} /> : <Plus size={18} />}
-      New Chat
+      Neuer Chat
     </Button>
   );
 };
