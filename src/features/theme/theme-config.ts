@@ -1,4 +1,4 @@
-export const AI_NAME = "Böni";
+export const AI_NAME = "Böhni";
 export const AI_DESCRIPTION = "Proof of Concept: ChatGPT via Azure Cloud und Anbindung an eigene Datenquellen";
 export const CHAT_DEFAULT_PERSONA = AI_NAME + " Standard";
 
