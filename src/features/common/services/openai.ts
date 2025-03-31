@@ -85,3 +85,11 @@ export const OpenAIDALLEInstance =  () => {
     return openai;
   }
 };
+
+//Temperatur Parameter aus Variable lesen
+export const getOpenAITemperature = (): number => {
+  const value = process.env.AZURE_OPENAI_TEMPERATURE;
+  const parsed = parseFloat(value ?? "");
+  return isNaN(parsed) ? 1.0 : parsed;
+};
+

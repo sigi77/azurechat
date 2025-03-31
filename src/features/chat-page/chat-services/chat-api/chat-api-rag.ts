@@ -2,7 +2,7 @@
 import "server-only";
 
 import { userHashedId } from "@/features/auth-page/helpers";
-import { OpenAIInstance } from "@/features/common/services/openai";
+import { OpenAIInstance, getOpenAITemperature } from "@/features/common/services/openai";
 import {
   ChatCompletionStreamingRunner,
   ChatCompletionStreamParams,
@@ -11,6 +11,8 @@ import { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import { SimilaritySearch } from "../azure-ai-search/azure-ai-search";
 import { CreateCitations, FormatCitations } from "../citation-service";
 import { ChatCitationModel, ChatThreadModel } from "../models";
+
+
 
 export const ChatApiRAG = async (props: {
   chatThread: ChatThreadModel;
@@ -66,6 +68,7 @@ ${userMessage}
   const stream: ChatCompletionStreamParams = {
     model: "",
     stream: true,
+    temperature: getOpenAITemperature(), // 👈 hier ist der neue Parameter
     messages: [
       {
         role: "system",
@@ -78,6 +81,7 @@ ${userMessage}
       },
     ],
   };
+
 
   return openAI.beta.chat.completions.stream(stream, { signal });
 };

@@ -1,12 +1,13 @@
 "use server";
 import "server-only";
 
-import { OpenAIInstance } from "@/features/common/services/openai";
+import { OpenAIInstance, getOpenAITemperature } from "@/features/common/services/openai";
 import { FindExtensionByID } from "@/features/extensions-page/extension-services/extension-service";
 import { RunnableToolFunction } from "openai/lib/RunnableFunction";
 import { ChatCompletionStreamingRunner } from "openai/resources/beta/chat/completions";
 import { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import { ChatThreadModel } from "../models";
+
 export const ChatApiExtensions = async (props: {
   chatThread: ChatThreadModel;
   userMessage: string;
@@ -18,24 +19,26 @@ export const ChatApiExtensions = async (props: {
 
   const openAI = OpenAIInstance();
   const systemMessage = await extensionsSystemMessage(chatThread);
+
   return openAI.beta.chat.completions.runTools(
-    {
-      model: "",
-      stream: true,
-      messages: [
-        {
-          role: "system",
-          content: chatThread.personaMessage + "\n" + systemMessage,
-        },
-        ...history,
-        {
-          role: "user",
-          content: userMessage,
-        },
-      ],
-      tools: extensions,
-    },
-    { signal: signal }
+      {
+        model: "",
+        stream: true,
+        temperature: getOpenAITemperature(),
+        messages: [
+          {
+            role: "system",
+            content: chatThread.personaMessage + "\n" + systemMessage,
+          },
+          ...history,
+          {
+            role: "user",
+            content: userMessage,
+          },
+        ],
+        tools: extensions,
+      },
+      { signal: signal }
   );
 };
 
