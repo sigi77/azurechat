@@ -14,17 +14,25 @@ export const ChatApiExtensions = async (props: {
   history: ChatCompletionMessageParam[];
   extensions: RunnableToolFunction<any>[];
   signal: AbortSignal;
+  temperature?: number;
 }): Promise<ChatCompletionStreamingRunner> => {
   const { userMessage, history, signal, chatThread, extensions } = props;
 
   const openAI = OpenAIInstance();
   const systemMessage = await extensionsSystemMessage(chatThread);
 
+
+    console.log(
+        "[ChatApiExtensions] Temperature used:",
+        props.temperature ?? getOpenAITemperature(),
+        "(provided:", props.temperature, ", fallback:", getOpenAITemperature(), ")"
+    );
+
   return openAI.beta.chat.completions.runTools(
       {
         model: "",
         stream: true,
-        temperature: getOpenAITemperature(),
+        temperature: props.temperature ?? getOpenAITemperature(),
         messages: [
           {
             role: "system",

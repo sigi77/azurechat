@@ -27,6 +27,7 @@ let abortController: AbortController = new AbortController();
 
 type chatStatus = "idle" | "loading" | "file upload";
 
+
 class ChatState {
   public messages: Array<ChatMessageModel> = [];
   public loading: chatStatus = "idle";
@@ -35,6 +36,7 @@ class ChatState {
   public autoScroll: boolean = false;
   public userName: string = "";
   public chatThreadId: string = "";
+  public temperature: number = 0.7;
 
   private chatThread: ChatThreadModel | undefined;
 
@@ -45,6 +47,10 @@ class ChatState {
     } else {
       this.messages.push(message);
     }
+  }
+
+  public updateTemperature(val: number) {
+    this.temperature = val;
   }
 
   private removeMessage(id: string) {
@@ -284,6 +290,7 @@ class ChatState {
     const body = JSON.stringify({
       id: this.chatThreadId,
       message: this.input,
+      temperature: this.temperature,
     });
     formData.append("content", body);
 

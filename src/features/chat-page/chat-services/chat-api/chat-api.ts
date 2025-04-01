@@ -72,6 +72,7 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
         userMessage: props.message,
         history: history,
         signal: signal,
+        temperature: props.temperature,
       });
       break;
     case "multimodal":
@@ -80,6 +81,7 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
         userMessage: props.message,
         file: props.multimodalImage,
         signal: signal,
+        temperature: props.temperature,
       });
       break;
     case "extensions":
@@ -89,6 +91,7 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
         history: history,
         extensions: extension,
         signal: signal,
+        temperature: props.temperature,
       });
       break;
   }

@@ -19,6 +19,7 @@ export const ChatApiRAG = async (props: {
   userMessage: string;
   history: ChatCompletionMessageParam[];
   signal: AbortSignal;
+  temperature?: number;
 }): Promise<ChatCompletionStreamingRunner> => {
   const { chatThread, userMessage, history, signal } = props;
 
@@ -64,11 +65,12 @@ ${content}
 question: 
 ${userMessage}
 `;
+  console.log("[ChatApiRAG] Temperature used:", props.temperature);
 
   const stream: ChatCompletionStreamParams = {
     model: "",
     stream: true,
-    temperature: getOpenAITemperature(), // 👈 hier ist der neue Parameter
+    temperature: props.temperature ?? getOpenAITemperature(),
     messages: [
       {
         role: "system",

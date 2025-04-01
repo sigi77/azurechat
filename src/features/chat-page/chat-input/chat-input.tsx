@@ -31,6 +31,8 @@ import {
   textToSpeechStore,
   useTextToSpeech,
 } from "./speech/use-text-to-speech";
+import { TemperatureSlider } from "./prompt/temperature-slider"
+
 
 export const ChatInput = () => {
   const { loading, input, chatThreadId } = useChat();
@@ -38,6 +40,9 @@ export const ChatInput = () => {
   const { isPlaying } = useTextToSpeech();
   const { isMicrophoneReady } = useSpeechToText();
   const { rows } = useChatInputDynamicHeight();
+
+  const { temperature } = useChat();
+  const setTemperature = (val: number) => chatStore.updateTemperature(val);
 
   const submitButton = React.useRef<HTMLButtonElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
@@ -75,6 +80,7 @@ export const ChatInput = () => {
           chatStore.updateInput(e.currentTarget.value);
         }}
       />
+
       <ChatInputActionArea>
         <ChatInputSecondaryActionArea>
           <AttachFile
@@ -82,6 +88,10 @@ export const ChatInput = () => {
               fileStore.onFileChange({ formData, chatThreadId })
             }
           />
+            <TemperatureSlider
+                value={temperature}
+                onChange={setTemperature}
+            />
           <PromptSlider />
         </ChatInputSecondaryActionArea>
         <ChatInputPrimaryActionArea>

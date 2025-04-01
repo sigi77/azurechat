@@ -9,6 +9,7 @@ export const ChatApiMultimodal = (props: {
   userMessage: string;
   file: string;
   signal: AbortSignal;
+  temperature?: number;
 }): ChatCompletionStreamingRunner => {
   const { chatThread, userMessage, signal, file } = props;
 
