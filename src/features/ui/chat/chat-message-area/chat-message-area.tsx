@@ -10,6 +10,9 @@ import { useEffect, useState } from "react";
 import { Avatar, AvatarImage } from "../../avatar";
 import { Button } from "../../button";
 
+const showAiSearchOutput = false;
+const showToolOutput = false;
+
 export const ChatMessageArea = (props: {
   children?: React.ReactNode;
   profilePicture?: string | null;
@@ -65,6 +68,13 @@ export const ChatMessageArea = (props: {
       break;
     default:
       break;
+  }
+
+  if (
+      (props.role === "tool" && !showToolOutput) ||
+      (props.role === "function" && !showAiSearchOutput)
+  ) {
+    return null;
   }
 
   return (
