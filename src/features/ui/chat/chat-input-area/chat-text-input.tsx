@@ -8,7 +8,7 @@ export const ChatTextInput = React.forwardRef<
     <textarea
       ref={ref}
       className="p-4 w-full focus:outline-none bg-transparent resize-none "
-      placeholder="Type your message here..."
+      placeholder="Verfasse hier deinen Prompt ..."
       {...props}
     />
   );
