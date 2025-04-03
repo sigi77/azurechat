@@ -37,6 +37,7 @@ class ChatState {
   public userName: string = "";
   public chatThreadId: string = "";
   public temperature: number = 0.7;
+  public agent: string | null = null;
 
   private chatThread: ChatThreadModel | undefined;
 
@@ -47,6 +48,14 @@ class ChatState {
     } else {
       this.messages.push(message);
     }
+  }
+
+  public updateAgent(value: string | null) {
+    this.agent = value;
+  }
+
+  public resetAgent() {
+    this.agent = null;
   }
 
   public updateTemperature(val: number) {
@@ -291,6 +300,7 @@ class ChatState {
       id: this.chatThreadId,
       message: this.input,
       temperature: this.temperature,
+      agent: this.agent,
     });
     formData.append("content", body);
 

@@ -18,6 +18,11 @@ import { GetDynamicExtensions } from "./chat-api-dynamic-extensions";
 import { ChatApiExtensions } from "./chat-api-extension";
 import { ChatApiMultimodal } from "./chat-api-multimodal";
 import { OpenAIStream } from "./open-ai-stream";
+import { AzureAgentStream } from "./azure-agent-stream";
+
+// 🆕 Azure Agent Import
+import { runAzureAgent } from "../azure-agent-service";
+
 type ChatTypes = "extensions" | "chat-with-file" | "multimodal";
 
 export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
@@ -28,8 +33,27 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
   }
 
   const currentChatThread = currentChatThreadResponse.response;
+  //props.agent = "azure-agent";
+  console.log("Agents", props.agent)
+  // 🆕 Wenn explizit Azure-Agent gewählt wurde, leite Anfrage direkt an diesen Agent weiter
+  if (props.agent === "azure-agent") {
+    const agentResponse = await runAzureAgent(props.message);
 
-  // promise all to get user, history and docs
+    const readableStream = AzureAgentStream({
+      agentResponse,
+      chatThreadId: currentChatThread.id,
+    });
+
+    return new Response(readableStream, {
+      headers: {
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
+        "Content-Type": "text/event-stream",
+      },
+    });
+  }
+
+  // 👇 Nur wenn kein Azure-Agent verwendet wird, normale Logik mit GPT:
   const [user, history, docs, extension] = await Promise.all([
     getCurrentUser(),
     _getHistory(currentChatThread),
@@ -40,8 +64,7 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
       signal,
     }),
   ]);
-  // Starting values for system and user prompt
-  // Note that the system message will also get prepended with the extension execution steps. Please see ChatApiExtensions method.
+ console.log("hier");
   currentChatThread.personaMessage = `${CHAT_DEFAULT_SYSTEM_PROMPT} \n\n ${currentChatThread.personaMessage}`;
 
   let chatType: ChatTypes = "extensions";
@@ -54,7 +77,6 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
     chatType = "extensions";
   }
 
-  // save the user message
   await CreateChatMessage({
     name: user.name,
     content: props.message,
@@ -111,9 +133,7 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
 };
 
 const _getHistory = async (chatThread: ChatThreadModel) => {
-  const historyResponse = await FindTopChatMessagesForCurrentUser(
-    chatThread.id
-  );
+  const historyResponse = await FindTopChatMessagesForCurrentUser(chatThread.id);
 
   if (historyResponse.status === "OK") {
     const historyResults = historyResponse.response;
@@ -121,7 +141,6 @@ const _getHistory = async (chatThread: ChatThreadModel) => {
   }
 
   console.error("🔴 Error on getting history:", historyResponse.errors);
-
   return [];
 };
 
@@ -156,8 +175,8 @@ const _getExtensions = async (props: {
     extensionIds: props.chatThread.extension,
   });
   if (
-    dynamicExtensionsResponse.status === "OK" &&
-    dynamicExtensionsResponse.response.length > 0
+      dynamicExtensionsResponse.status === "OK" &&
+      dynamicExtensionsResponse.response.length > 0
   ) {
     extension.push(...dynamicExtensionsResponse.response);
   }

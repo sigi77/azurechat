@@ -42,6 +42,7 @@ export const ChatInput = () => {
   const { rows } = useChatInputDynamicHeight();
 
   const { temperature } = useChat();
+  const { agent } = useChat();
   const setTemperature = (val: number) => chatStore.updateTemperature(val);
 
   const submitButton = React.useRef<HTMLButtonElement>(null);
@@ -95,6 +96,16 @@ export const ChatInput = () => {
           <PromptSlider />
         </ChatInputSecondaryActionArea>
         <ChatInputPrimaryActionArea>
+          <button
+              onClick={() => chatStore.updateAgent(agent === "azure-agent" ? null : "azure-agent")}
+              className={`p-2 rounded-full transition ${
+                  agent === "azure-agent"
+                      ? "bg-blue-500 text-white"
+                      : "text-blue-600"
+              }`}
+          >
+            🌐
+          </button>
           <ImageInput />
           <Microphone
             startRecognition={() => speechToTextStore.startRecognition()}

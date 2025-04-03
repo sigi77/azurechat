@@ -41,6 +41,7 @@ export interface UserPrompt {
   message: string;
   multimodalImage: string;
   temperature?: number;
+  agent?: string;
 }
 
 export interface ChatDocumentModel {

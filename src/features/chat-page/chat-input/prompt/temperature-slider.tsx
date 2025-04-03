@@ -10,7 +10,7 @@ export const TemperatureSlider = ({
 }) => {
     return (
         <div className="flex items-center gap-2 w-[100px]">
-            <span className="text-xs text-muted-foreground">🔥</span>
+            <span className="text-xs text-muted-foreground">❄️</span>
             <input
                 type="range"
                 min="0"
@@ -20,6 +20,7 @@ export const TemperatureSlider = ({
                 onChange={(e) => onChange(parseFloat(e.target.value))}
                 className="w-full"
             />
+            <span className="text-xs text-muted-foreground">🔥</span>
         </div>
     );
 };
