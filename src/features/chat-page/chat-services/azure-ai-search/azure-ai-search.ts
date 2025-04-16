@@ -154,7 +154,7 @@ export const ExtensionSimilaritySearch = async (props: {
     );
 
     const searchResults = await searchClient.search(searchText, {
-      top: 3,
+      top: 100,
       vectorSearchOptions: {
         queries: [
           {
