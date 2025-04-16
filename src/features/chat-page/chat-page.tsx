@@ -59,7 +59,7 @@ export const ChatPage: FC<ChatPageProps> = (props) => {
                 onCopy={() => {
                   console.log("📋 Inhalt von message.content:", message.content);
 
-                  let content = message.content;
+                  let content: unknown = message.content;
                   let copyText = "";
 
                   try {
@@ -68,9 +68,9 @@ export const ChatPage: FC<ChatPageProps> = (props) => {
                         typeof content === "object" &&
                         content !== null &&
                         "answer" in content &&
-                        typeof content.answer === "string"
+                        typeof (content as any).answer === "string"
                     ) {
-                      copyText = content.answer;
+                      copyText = (content as any).answer;
                     }
                     // Wenn content ein JSON-String ist:
                     else if (typeof content === "string") {
@@ -81,7 +81,6 @@ export const ChatPage: FC<ChatPageProps> = (props) => {
                         copyText = content;
                       }
                     } else {
-                      // Fallback für andere Typen
                       copyText = String(content);
                     }
                   } catch (err) {
@@ -91,6 +90,7 @@ export const ChatPage: FC<ChatPageProps> = (props) => {
 
                   navigator.clipboard.writeText(copyText);
                 }}
+
                 profilePicture={
                   message.role === "assistant"
                     ? "/Boeni.png"

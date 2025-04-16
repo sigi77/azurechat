@@ -7,6 +7,25 @@ const RESOURCE_GROUP = "rg-azure-chat";
 const PROJECT = "it-3567";
 const AGENT_ID = "asst_SLWnwzPvjT1fcMjsJ01KjvHG";
 
+// Optional: Minimale Typdefinition, um den Fehler TS2339 zu verhindern
+// ohne weitere Dateien anpassen zu müssen
+interface AgentTextContent {
+    value: string;
+    annotations?: {
+        type: string;
+        text: string;
+        url_citation?: {
+            url: string;
+            title: string;
+        };
+    }[];
+}
+
+interface AgentTextBlock {
+    type: string;
+    text: AgentTextContent;
+}
+
 export async function runAzureAgent(userInput: string): Promise<string> {
     const client = new AIProjectsClient(
         ENDPOINT,
@@ -17,13 +36,13 @@ export async function runAzureAgent(userInput: string): Promise<string> {
     );
 
     const agent = await client.agents.getAgent(AGENT_ID);
-    // @ts-ignore
-    const thread = await client.agents.createThread(agent.id);
+    const thread = await client.agents.createThread();
 
     await client.agents.createMessage(thread.id, {
         role: "user",
-        content: `Please answer and always cite your sources using markdown links like [NZZ](https://nzz.ch).\n\n${userInput}`,
-        //content: userInput,
+        content: `Please answer .
+
+${userInput}`,
     });
 
     let run = await client.agents.createRun(thread.id, agent.id);
@@ -34,15 +53,15 @@ export async function runAzureAgent(userInput: string): Promise<string> {
     }
 
     const messages = await client.agents.listMessages(thread.id);
-    console.dir(messages.data, { depth: null });
     const last = messages.data.reverse().find((m: any) => m.role === "assistant");
 
-    console.log("📎 Gefundene Antwort:", last?.content?.[0]?.text?.value);
-    console.log("🔗 Gefundene Annotations:", last?.content?.[0]?.text?.annotations);
+    const firstBlock = last?.content?.[0] as AgentTextBlock;
 
-    // @ts-ignore
-    return {
-        answer: last?.content?.[0]?.text?.value ?? "(keine Antwort vom Agenten)",
-        citations: last?.content?.[0]?.text?.annotations ?? [],
-    };
+    const answer = firstBlock?.text?.value ?? "(keine Antwort vom Agenten)";
+    const citations = firstBlock?.text?.annotations ?? [];
+
+    console.log("📎 Gefundene Antwort:", answer);
+    console.log("🔗 Gefundene Annotations:", citations);
+
+    return JSON.stringify({ answer, citations });
 }

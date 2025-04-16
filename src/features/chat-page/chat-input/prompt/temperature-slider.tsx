@@ -1,13 +1,17 @@
 "use client";
-import { useState } from "react";
+import React from "react";
 
-export const TemperatureSlider = ({
-                                      value,
-                                      onChange,
-                                  }: {
+interface TemperatureSliderProps {
     value: number;
     onChange: (val: number) => void;
-}) => {
+}
+
+// @ts-ignore
+// @ts-ignore
+export const TemperatureSlider: React.FC<TemperatureSliderProps> = ({
+                                                                        value,
+                                                                        onChange,
+                                                                    }) => {
     return (
         <div className="flex items-center gap-2 w-[100px]">
             <span className="text-xs text-muted-foreground">❄️</span>
