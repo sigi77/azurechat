@@ -57,7 +57,39 @@ export const ChatPage: FC<ChatPageProps> = (props) => {
                 profileName={message.name}
                 role={message.role}
                 onCopy={() => {
-                  navigator.clipboard.writeText(message.content);
+                  console.log("📋 Inhalt von message.content:", message.content);
+
+                  let content = message.content;
+                  let copyText = "";
+
+                  try {
+                    // Wenn content ein Objekt ist und ein "answer"-Feld hat:
+                    if (
+                        typeof content === "object" &&
+                        content !== null &&
+                        "answer" in content &&
+                        typeof content.answer === "string"
+                    ) {
+                      copyText = content.answer;
+                    }
+                    // Wenn content ein JSON-String ist:
+                    else if (typeof content === "string") {
+                      const parsed = JSON.parse(content);
+                      if (parsed?.answer && typeof parsed.answer === "string") {
+                        copyText = parsed.answer;
+                      } else {
+                        copyText = content;
+                      }
+                    } else {
+                      // Fallback für andere Typen
+                      copyText = String(content);
+                    }
+                  } catch (err) {
+                    console.warn("⚠️ Fehler beim Parsen:", err);
+                    copyText = typeof content === "string" ? content : String(content);
+                  }
+
+                  navigator.clipboard.writeText(copyText);
                 }}
                 profilePicture={
                   message.role === "assistant"

@@ -132,7 +132,7 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
   });
 };
 
-const _getHistory = async (chatThread: ChatThreadModel) => {
+/*const _getHistory = async (chatThread: ChatThreadModel) => {
   const historyResponse = await FindTopChatMessagesForCurrentUser(chatThread.id);
 
   if (historyResponse.status === "OK") {
@@ -142,7 +142,30 @@ const _getHistory = async (chatThread: ChatThreadModel) => {
 
   console.error("🔴 Error on getting history:", historyResponse.errors);
   return [];
+};*/
+
+const _getHistory = async (chatThread: ChatThreadModel) => {
+  const historyResponse = await FindTopChatMessagesForCurrentUser(chatThread.id);
+
+  if (historyResponse.status === "OK") {
+    const historyResults = historyResponse.response;
+    const mapped = mapOpenAIChatMessages(historyResults).reverse();
+
+    // 🛡 absichern, dass message.content immer string ist
+    const safeHistory = mapped.map((msg) => ({
+      ...msg,
+      content: typeof msg.content === "string"
+          ? msg.content
+          : JSON.stringify(msg.content),
+    }));
+
+    return safeHistory;
+  }
+
+  console.error("🔴 Error on getting history:", historyResponse.errors);
+  return [];
 };
+
 
 const _getDocuments = async (chatThread: ChatThreadModel) => {
   const docsResponse = await FindAllChatDocuments(chatThread.id);

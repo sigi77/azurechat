@@ -12,11 +12,9 @@ import { SimilaritySearch } from "../azure-ai-search/azure-ai-search";
 import { CreateCitations, FormatCitations } from "../citation-service";
 import { ChatCitationModel, ChatThreadModel } from "../models";
 
-
-
 export const ChatApiRAG = async (props: {
   chatThread: ChatThreadModel;
-  userMessage: string;
+  userMessage: string | object; // 👈 auch object möglich
   history: ChatCompletionMessageParam[];
   signal: AbortSignal;
   temperature?: number;
@@ -26,9 +24,9 @@ export const ChatApiRAG = async (props: {
   const openAI = OpenAIInstance();
 
   const documentResponse = await SimilaritySearch(
-    userMessage,
-    10,
-    `user eq '${await userHashedId()}' and chatThreadId eq '${chatThread.id}'`
+      typeof userMessage === "string" ? userMessage : "",
+      10,
+      `user eq '${await userHashedId()}' and chatThreadId eq '${chatThread.id}'`
   );
 
   const documents: ChatCitationModel[] = [];
@@ -45,14 +43,16 @@ export const ChatApiRAG = async (props: {
   }
 
   const content = documents
-    .map((result, index) => {
-      const content = result.content.document.pageContent;
-      const context = `[${index}]. file name: ${result.content.document.metadata} \n file id: ${result.id} \n ${content}`;
-      return context;
-    })
-    .join("\n------\n");
-  // Augment the user prompt
-  const _userMessage = `\n
+      .map((result, index) => {
+        const content = result.content.document.pageContent;
+        const context = `[${index}]. file name: ${result.content.document.metadata} \n file id: ${result.id} \n ${content}`;
+        return context;
+      })
+      .join("\n------\n");
+
+  const _userMessage =
+      typeof userMessage === "string"
+          ? `\n
 - Review the following content from documents uploaded by the user and create a final answer.
 - If you don't know the answer, just say that you don't know. Don't try to make up an answer.
 - You must always include a citation at the end of your answer and don't include full stop after the citations.
@@ -64,11 +64,13 @@ ${content}
 ---------------- \n
 question: 
 ${userMessage}
-`;
+`
+          : JSON.stringify(userMessage); // 🛡️ Schutz für strukturierte Eingaben (z. B. Agent mit answer/citations)
+
   console.log("[ChatApiRAG] Temperature used:", props.temperature);
 
   const stream: ChatCompletionStreamParams = {
-    model: "",
+    model: "", // Setze hier dein Modell
     stream: true,
     temperature: props.temperature ?? getOpenAITemperature(),
     messages: [
@@ -83,7 +85,6 @@ ${userMessage}
       },
     ],
   };
-
 
   return openAI.beta.chat.completions.stream(stream, { signal });
 };

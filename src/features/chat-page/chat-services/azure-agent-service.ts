@@ -22,7 +22,8 @@ export async function runAzureAgent(userInput: string): Promise<string> {
 
     await client.agents.createMessage(thread.id, {
         role: "user",
-        content: userInput,
+        content: `Please answer and always cite your sources using markdown links like [NZZ](https://nzz.ch).\n\n${userInput}`,
+        //content: userInput,
     });
 
     let run = await client.agents.createRun(thread.id, agent.id);
@@ -33,8 +34,15 @@ export async function runAzureAgent(userInput: string): Promise<string> {
     }
 
     const messages = await client.agents.listMessages(thread.id);
+    console.dir(messages.data, { depth: null });
     const last = messages.data.reverse().find((m: any) => m.role === "assistant");
 
+    console.log("📎 Gefundene Antwort:", last?.content?.[0]?.text?.value);
+    console.log("🔗 Gefundene Annotations:", last?.content?.[0]?.text?.annotations);
+
     // @ts-ignore
-    return last?.content?.[0]?.text?.value ?? "(keine Antwort vom Agenten)";
+    return {
+        answer: last?.content?.[0]?.text?.value ?? "(keine Antwort vom Agenten)",
+        citations: last?.content?.[0]?.text?.annotations ?? [],
+    };
 }
