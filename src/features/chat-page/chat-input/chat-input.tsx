@@ -97,7 +97,11 @@ export const ChatInput = () => {
         </ChatInputSecondaryActionArea>
         <ChatInputPrimaryActionArea>
           <button
-              onClick={() => chatStore.updateAgent(agent === "azure-agent" ? null : "azure-agent")}
+              onClick={() => {
+                const newAgent = agent === "azure-agent" ? null : "azure-agent";
+                chatStore.updateAgent(newAgent);
+                console.log("Aktiver Agent", chatStore.agent)// ✅ sauber setzen
+              }}
               className={`p-2 rounded-full transition ${
                   agent === "azure-agent"
                       ? "bg-blue-500 text-white"
