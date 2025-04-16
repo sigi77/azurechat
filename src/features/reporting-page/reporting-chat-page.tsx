@@ -26,7 +26,23 @@ export default function ReportingChatPage(props: ReportingChatPageProps) {
                 profileName={message.name}
                 role={message.role}
                 onCopy={() => {
-                  navigator.clipboard.writeText(message.content);
+                  //navigator.clipboard.writeText(message.content);
+                  console.log("📋 Inhalt von message.content:", message.content);
+
+                  const raw = message.content;
+
+                  let copyText = raw;
+
+                  try {
+                    const parsed = JSON.parse(raw);
+                    if (parsed && typeof parsed.answer === "string") {
+                      copyText = parsed.answer;
+                    }
+                  } catch {
+                    // Ignorieren – ist kein JSON, dann einfach originalen Inhalt verwenden
+                  }
+
+                  navigator.clipboard.writeText(copyText);
                 }}
                 profilePicture={
                   message.role === "assistant" ? "/Boeni.png" : undefined
