@@ -68,9 +68,9 @@ export const ChatPage: FC<ChatPageProps> = (props) => {
                         typeof content === "object" &&
                         content !== null &&
                         "answer" in content &&
-                        typeof content.answer === "string"
+                        typeof (content as { answer: unknown }).answer === "string"
                     ) {
-                      copyText = content.answer;
+                      copyText = (content as { answer: string }).answer;
                     }
                     // Wenn content ein JSON-String ist:
                     else if (typeof content === "string") {
