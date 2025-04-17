@@ -220,7 +220,7 @@ class ChatState {
               break;
             case "content":
               const mappedContent: ChatMessageModel = {
-                id: uniqueId(),
+                id: responseType.response.id,
                 content: responseType.response.choices[0].message.content || "",
                 name: AI_NAME,
                 role: "assistant",
@@ -232,7 +232,12 @@ class ChatState {
                 multiModalImage: "",
               };
 
-              this.addToMessages(mappedContent);
+             /* console.log("🧩 Assistant-Chunk", {
+                id: mappedContent.id,
+                createdAt: mappedContent.createdAt,
+                contentSnippet: mappedContent.content.slice(0, 40),
+              });*/
+              this.addOrReplaceAssistantMessage(mappedContent);
               this.lastMessage = mappedContent.content;
 
               break;
@@ -275,6 +280,26 @@ class ChatState {
       this.loading = "idle";
     }
   }
+
+  private addOrReplaceAssistantMessage(partial: ChatMessageModel) {
+    const existing = this.messages.find(
+        (msg) => msg.role === "assistant" && msg.id === partial.id
+    );
+
+    if (existing) {
+      existing.content = partial.content;
+    } else {
+      this.messages.push({
+        ...partial,
+        createdAt: new Date(), // Nur hier setzen!
+      });
+    }
+
+    // Nach jedem Push/Update sauber sortieren
+    this.messages.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+  }
+
+
 
   private async updateTitle() {
     if (this.chatThread && this.chatThread.name === NEW_CHAT_NAME) {
