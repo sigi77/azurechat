@@ -48,7 +48,9 @@ class ChatState {
     } else {
       this.messages.push(message);
     }
+    this.logMessages();
   }
+
 
   public updateAgent(value: string | null) {
     this.agent = value;
@@ -164,6 +166,7 @@ class ChatState {
     };
 
     this.messages.push(newUserMessage);
+    this.logMessages();
     this.reset();
 
     const controller = new AbortController();
@@ -217,7 +220,7 @@ class ChatState {
               break;
             case "content":
               const mappedContent: ChatMessageModel = {
-                id: responseType.response.id,
+                id: uniqueId(),
                 content: responseType.response.choices[0].message.content || "",
                 name: AI_NAME,
                 role: "assistant",
@@ -306,10 +309,20 @@ class ChatState {
 
     this.chat(formData);
   }
+  private logMessages() {
+    console.log("🧾 Aktueller Message-Store:");
+    this.messages.forEach((msg, index) => {
+      console.log(`${index + 1}. [${msg.role}] ${msg.name || ""} – ${msg.createdAt}`);
+    });
+  }
 }
+
+
 
 export const chatStore = proxy(new ChatState());
 
 export const useChat = () => {
   return useSnapshot(chatStore, { sync: true });
 };
+
+

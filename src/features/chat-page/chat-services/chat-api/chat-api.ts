@@ -33,6 +33,25 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
   }
 
   const currentChatThread = currentChatThreadResponse.response;
+  console.log("✅ Message created:", props.message)
+  const [user, history, docs, extension] = await Promise.all([
+    getCurrentUser(),
+    _getHistory(currentChatThread),
+    _getDocuments(currentChatThread),
+    _getExtensions({
+      chatThread: currentChatThread,
+      userMessage: props.message,
+      signal,
+    }),
+  ]);
+  await CreateChatMessage({
+    name: user.name,
+    content: props.message,
+    role: "user",
+    chatThreadId: currentChatThread.id,
+    multiModalImage: props.multimodalImage,
+  });
+
   //props.agent = "azure-agent";
   console.log("Agents", props.agent)
   // 🆕 Wenn explizit Azure-Agent gewählt wurde, leite Anfrage direkt an diesen Agent weiter
@@ -54,17 +73,8 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
   }
 
   // 👇 Nur wenn kein Azure-Agent verwendet wird, normale Logik mit GPT:
-  const [user, history, docs, extension] = await Promise.all([
-    getCurrentUser(),
-    _getHistory(currentChatThread),
-    _getDocuments(currentChatThread),
-    _getExtensions({
-      chatThread: currentChatThread,
-      userMessage: props.message,
-      signal,
-    }),
-  ]);
- console.log("hier");
+
+// console.log("hier");
   currentChatThread.personaMessage = `${CHAT_DEFAULT_SYSTEM_PROMPT} \n\n ${currentChatThread.personaMessage}`;
 
   let chatType: ChatTypes = "extensions";
@@ -77,13 +87,7 @@ export const ChatAPIEntry = async (props: UserPrompt, signal: AbortSignal) => {
     chatType = "extensions";
   }
 
-  await CreateChatMessage({
-    name: user.name,
-    content: props.message,
-    role: "user",
-    chatThreadId: currentChatThread.id,
-    multiModalImage: props.multimodalImage,
-  });
+
 
   let runner: ChatCompletionStreamingRunner;
 

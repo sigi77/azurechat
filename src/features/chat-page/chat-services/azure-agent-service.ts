@@ -63,5 +63,5 @@ ${userInput}`,
     console.log("📎 Gefundene Antwort:", answer);
     console.log("🔗 Gefundene Annotations:", citations);
 
-    return JSON.stringify({ answer, citations });
+    return JSON.stringify({ answer, citations,  createdAt: new Date().toISOString(),  });
 }
